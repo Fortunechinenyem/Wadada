@@ -1,10 +1,40 @@
+import Footer from "@/app/components/Footer";
+import Link from "next/link";
+
 export default function Home() {
   return (
-    <div className="text-center mt-7">
-      <div>
-        <h1 className="text-4xl font-bold">Welcome to Wadada</h1>
+    <div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="w-full max-w-lg p-8 bg-white shadow-lg rounded-lg">
+          <h1 className="text-4xl font-extrabold text-center text-blue-600">
+            Welcome to Wadada
+          </h1>
+          <p className="mt-4 text-center text-gray-600">
+            Your sure plug for anything payment.
+          </p>
+
+          <div className="mt-8">
+            <h2 className="text-2xl font-semibold text-center text-gray-800">
+              Get Started
+            </h2>
+            <div className="flex flex-col items-center mt-8 space-y-4">
+              <Link
+                href="/register"
+                className="w-full px-4 py-2 text-center text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:w-auto"
+              >
+                Register
+              </Link>
+              <Link
+                href="/login"
+                className="w-full px-4 py-2 text-center text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 focus:ring-2 focus:ring-blue-500 focus:outline-none sm:w-auto"
+              >
+                Log in
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
-      <p className="mt-4">Your sure plug for anything payment.</p>
+      <Footer />
     </div>
   );
 }
