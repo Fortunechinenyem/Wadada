@@ -3,6 +3,15 @@ import { useAuth } from "../hooks/useAuth";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { FiLogOut } from "react-icons/fi";
+import { db } from "../lib/firebase";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  startAfter,
+} from "firebase/firestore";
+import TransactionHistory from "../app/components/TransactionHistory";
 
 export default function Dashboard() {
   const { user, loading, logout } = useAuth();
@@ -20,6 +29,28 @@ export default function Dashboard() {
         <div className="spinner-border animate-spin inline-block w-12 h-12 border-4 rounded-full border-t-4 border-gray-200 border-solid"></div>
       </div>
     );
+  const fetchTransactions = async (lastVisibleDoc = null, pageSize = 10) => {
+    const transactionsRef = collection(db, "transactions");
+    let q = query(transactionsRef, orderBy("date", "desc"), limit(pageSize));
+
+    if (lastVisibleDoc) {
+      q = query(
+        transactionsRef,
+        orderBy("date", "desc"),
+        startAfter(lastVisibleDoc),
+        limit(pageSize)
+      );
+    }
+
+    const snapshot = await getDocs(q);
+    const transactions = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+
+    return { transactions, lastDoc };
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -84,6 +115,9 @@ export default function Dashboard() {
             <button className="w-full mt-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
               Update Profile
             </button>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md" id="transactions">
+            <TransactionHistory />
           </div>
         </div>
       </div>
