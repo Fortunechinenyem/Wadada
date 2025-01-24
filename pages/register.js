@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useRouter } from "next/router";
 
 export default function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,7 +13,15 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      await updateProfile(userCredential.user, {
+        displayName: name,
+      });
       router.push("/login");
     } catch (err) {
       setError(err.message);
@@ -27,6 +36,14 @@ export default function Register() {
       >
         <h2 className="text-xl font-bold text-center mb-4">Register</h2>
         {error && <p className="text-red-500">{error}</p>}
+        <input
+          type="text"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full px-3 py-2 border rounded mb-3"
+          required
+        />
         <input
           type="email"
           placeholder="Email"
