@@ -1,0 +1,25 @@
+// firestore.rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Match all documents in the "users" collection
+    match /users/{userId} {
+      // Allow the user to read and write their own user data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Match all documents in the "transactions" collection
+    match /transactions/{transactionId} {
+      // Allow users to read their own transactions, but not modify them
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      
+      // Allow admins to read and write all transactions
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    // Default rule: Deny all access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
