@@ -10,7 +10,8 @@ export default function Home() {
             Welcome to Wadada
           </h1>
           <p className="mt-4 text-center text-gray-600">
-            Your sure plug for anything payment.
+            Your Digital "Esusu" - Seamless payments and group management made
+            easy.
           </p>
 
           <div className="mt-8">
@@ -32,8 +33,29 @@ export default function Home() {
               </Link>
             </div>
           </div>
+
+          <div className="mt-12">
+            <h2 className="text-2xl font-semibold text-center text-gray-800">
+              Explore Features
+            </h2>
+            <div className="flex flex-col items-center mt-8 space-y-4">
+              <Link
+                href="/groups"
+                className="w-full px-4 py-2 text-center text-green-600 border border-green-600 rounded-lg hover:bg-green-100 focus:ring-2 focus:ring-green-500 focus:outline-none sm:w-auto"
+              >
+                View Groups
+              </Link>
+              <Link
+                href="/groups/join"
+                className="w-full px-4 py-2 text-center text-green-600 border border-green-600 rounded-lg hover:bg-green-100 focus:ring-2 focus:ring-green-500 focus:outline-none sm:w-auto"
+              >
+                Join a Group
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
+
       <Footer />
     </div>
   );
