@@ -22,6 +22,14 @@ export default function UsersManagement() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
+  // const admin = require("firebase-admin");
+  // admin.initializeApp();
+
+  // const setAdminRole = async (uid) => {
+  //   await admin.auth().setCustomUserClaims(uid, { role: "admin" });
+  // };
+  // setAdminRole("exampleAdminUID");
+
   const USERS_PER_PAGE = 5;
 
   const fetchUsers = async (
@@ -39,14 +47,13 @@ export default function UsersManagement() {
         usersQuery = query(
           collection(db, "users"),
           where("name", ">=", searchValue),
-          where("name", "<=", searchValue + "\uf8ff"),
           orderBy("name"),
           limit(USERS_PER_PAGE)
         );
       } else if (statusValue) {
         usersQuery = query(
           collection(db, "users"),
-          where("status", "==", statusValue),
+          where("registeredAt", "!=", null),
           orderBy("registeredAt", "desc"),
           limit(USERS_PER_PAGE)
         );
@@ -65,7 +72,19 @@ export default function UsersManagement() {
             );
       }
 
-      const snapshot = await getDocs(usersQuery);
+      try {
+        const snapshot = await getDocs(usersQuery);
+      } catch (err) {
+        console.error("Firestore Error:", err);
+        setError(
+          "Failed to fetch users. Please check the console for details."
+        );
+      }
+      console.log("Fetching users with:", {
+        searchValue,
+        statusValue,
+        lastVisible,
+      });
 
       const usersData = snapshot.docs.map((doc) => ({
         id: doc.id,

@@ -7,6 +7,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { FiLogOut } from "react-icons/fi";
 import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../lib/firebase";
+import AdminRoleSetter from "../../app/components/AdminRoleSetter";
 
 export default function AdminPanel() {
   const { user, loading, logout } = useAuth();
@@ -19,10 +20,16 @@ export default function AdminPanel() {
   });
 
   useEffect(() => {
-    if (!loading && (!user || user.role !== "admin")) {
+    if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  // useEffect(() => {
+  //   if (!loading && (!user || user.role !== "admin")) {
+  //     router.push("/login");
+  //   }
+  // }, [user, loading, router]);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -125,6 +132,7 @@ export default function AdminPanel() {
             </p>
           </div>
         </div>
+        <AdminRoleSetter />
       </div>
     </div>
   );
