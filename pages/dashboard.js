@@ -8,6 +8,9 @@ import {
   FiUsers,
   FiSettings,
   FiPlusCircle,
+  FiClock,
+  FiTrendingUp,
+  FiCreditCard,
 } from "react-icons/fi";
 import { db } from "../lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
@@ -18,7 +21,8 @@ export default function Dashboard() {
   const [groups, setGroups] = useState([]);
   const [totalBalance, setTotalBalance] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
+  const [contributions, setContributions] = useState([]);
+  const [loans, setLoans] = useState([]);
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
@@ -26,7 +30,7 @@ export default function Dashboard() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    const fetchGroups = async () => {
+    const fetchData = async () => {
       if (user) {
         const groupsRef = collection(db, "groups");
         const q = query(
@@ -47,10 +51,23 @@ export default function Dashboard() {
 
         setGroups(groupsData);
         setTotalBalance(total);
+        const contribRef = collection(db, "contributions");
+        const contribQuery = query(contribRef, where("userId", "==", user.uid));
+        const contribSnapshot = await getDocs(contribQuery);
+        setContributions(
+          contribSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
+
+        const loanRef = collection(db, "loans");
+        const loanQuery = query(loanRef, where("userId", "==", user.uid));
+        const loanSnapshot = await getDocs(loanQuery);
+        setLoans(
+          loanSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
       }
     };
 
-    fetchGroups();
+    fetchData();
   }, [user]);
 
   if (loading)
@@ -95,6 +112,22 @@ export default function Dashboard() {
           </li>
           <li>
             <Link
+              href="/contributions"
+              className="flex items-center gap-2 text-lg hover:text-blue-300"
+            >
+              <FiTrendingUp /> Contributions
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/loans"
+              className="flex items-center gap-2 text-lg hover:text-blue-300"
+            >
+              <FiCreditCard /> Loans
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/settings"
               className="flex items-center gap-2 text-lg hover:text-blue-300"
             >
@@ -124,7 +157,36 @@ export default function Dashboard() {
               ₦{totalBalance.toLocaleString()}
             </p>
           </div>
-
+          <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+            <h3 className="text-xl font-medium text-gray-700">
+              Scheduled Contributions
+            </h3>
+            <ul className="mt-3 text-gray-600">
+              {contributions.length > 0 ? (
+                contributions.map((contribution) => (
+                  <li key={contribution.id}>
+                    {contribution.amount} - {contribution.date}
+                  </li>
+                ))
+              ) : (
+                <p>No contributions yet.</p>
+              )}
+            </ul>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+            <h3 className="text-xl font-medium text-gray-700">Active Loans</h3>
+            <ul className="mt-3 text-gray-600">
+              {loans.length > 0 ? (
+                loans.map((loan) => (
+                  <li key={loan.id}>
+                    ₦{loan.amount} - Due: {loan.dueDate}
+                  </li>
+                ))
+              ) : (
+                <p>No active loans.</p>
+              )}
+            </ul>
+          </div>
           <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
             <h3 className="text-xl font-medium text-gray-700">My Groups</h3>
             <ul className="mt-3 space-y-2 text-gray-600">
@@ -151,7 +213,6 @@ export default function Dashboard() {
             </ul>
           </div>
 
-          {/* Join a Group Card */}
           <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
             <h3 className="text-xl font-medium text-gray-700">Join a Group</h3>
             <Link
