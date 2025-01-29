@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import { getAuth } from "firebase/auth";
 
 export default function GroupList() {
   const [groups, setGroups] = useState([]);
@@ -10,15 +11,25 @@ export default function GroupList() {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+
+        if (!user) {
+          console.error("User not authenticated");
+          setLoading(false);
+          return;
+        }
+
         const snapshot = await getDocs(collection(db, "groups"));
         const groupData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setGroups(groupData);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching groups:", error);
+      } finally {
+        setLoading(false);
       }
     };
 

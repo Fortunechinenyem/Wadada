@@ -1,3 +1,3 @@
 import Logo from "./logo.png";
 
-export { Logo, Hero };
+export { Logo };
